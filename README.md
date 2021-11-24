@@ -1,6 +1,7 @@
 # SungrowInverter
 
 Provides a way to query Sungrow residential hybrid or string inverters for current state and statistics using ModBus TCP client.
+
 Currently does not support any writing to holding registers (for now).
 
 
