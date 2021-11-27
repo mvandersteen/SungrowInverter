@@ -6,10 +6,10 @@ Connect to a Sungrow modbus via TCP
 
 Supports Sungrow Hybrid & String inverters
 
-Refer Hybrid.py and string.py for inverters that are supported.
+Refer configs/hybrid.py and configs/string.py for inverters that are supported.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.5"
 
 from SungrowModbusTcpClient import SungrowModbusTcpClient
 
@@ -45,7 +45,7 @@ class SungrowInverter:
     SungrowInverter module for read modbus data from tcp connect to Sungrow inverters (hybrid / string) inverters supported
     """
 
-    def __init__(self, ip_address, port, slave=1, retries=3, timeout=REQUESTS_TIMEOUT):
+    def __init__(self, ip_address, port=502, slave=1, retries=3, timeout=REQUESTS_TIMEOUT):
         """Initialize a Sungrow Inverter TCP Modbus Client object"""
         self.manufacturer = "Sungrow"
 
