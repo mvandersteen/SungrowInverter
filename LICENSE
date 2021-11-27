@@ -1,5 +1,5 @@
-SungrowModbusTcpClient - A ModbusTCPClient wrapper for talking to Sungrow solar inverters
-Copyright (C) 2020 Roberto Panerai Velloso (rvelloso@gmail.com)
+SungrowIverter - connect to tcp modbus port of sungrow hybrid and string residential inverters
+Copyright (C) 2021 Mark Vandersteen (mark@physicalbytes.com)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
