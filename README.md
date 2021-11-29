@@ -10,7 +10,7 @@ Currently does not support any writing to holding registers (for now).
 
 Residential Hybrid Single Phase Inverter for Low Voltage Battery [48V to 70V]
 
-SH3K6 / SH4K6 / SH5K-V13 / SH5K-20 / SH4K6-30 / SH5K-30 / SH3K6-30
+SH3K6 / SH4K6 / SH5K-V13 (SH5K) / SH5K-20 / SH4K6-30 / SH5K-30 / SH3K6-30
 
 Residential Hybrid Single Phase Inverter wide battery voltage range [80V to 460V]
 
@@ -40,13 +40,32 @@ SG40KTL-M, SG50KTL-M, SG60KTL-M, SG60KU
 
 ## Usage
 
+If not called from within an async method
+
 ```python
+from sungrowinverter inport SungrowInverter
+import asyncio
+...
+
+client = SungrowInverter("192.168.1.27")
+
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+result = loop.run_until_complete(client.async_update())
+
+#Get a list data returned from the inverter.
+print(client.data)
+```
+
+If called within an async method in your application
+```
 from sungrowinverter inport SungrowInverter
 
 client = SungrowInverter("192.168.1.27")
-await client.async_update()
+client.async_update()
 
 #Get a list data returned from the inverter.
+print(client.model)
 print(client.data)
 ```
 
@@ -54,28 +73,55 @@ print(client.data)
 
 ### Contructor
 
-`SungrowInverter(ip_address, port=502, initialize=True, slave=0x01, retries3, timeout=60)`
+`SungrowInverter(ip_address, port=502, slave=0x01, retries3, timeout=60)`
 
 port: modbus TCP port defaults to 502 on sungrow inverters used here
 
-initialize: <True|False> if set will query inverter during setup of object and determine inverter model, nominal power capability and other statsic inverter related data
-
-slave: defaulted to 0x01 as per specs your inverter may nee to change this.
+slave: defaulted to 0x01 as per specs your inverter may need to change this.
 
 retries: number of attempts to query the registers on the inverter before failing
 
-timeout: <in seconds> tcp connection is stopped after this long
+timeout: <in seconds> tcp connection is timed out and fails after this long
 
 ### Methods
 
 Available methods and how to use
 
-`client.inverter_model()
+`client.inverter_model()` Returns a object of sungrowinverter.common.SungrowInverterModel with details of model, serial, nominal output power (kWh)
 
-`client.async_update()
+`client.async_update()` Calls set of registers for the relevant inverter and updates data parameter
+  
+### Parameters Available
 
-### Variables
+#### All inverters
+  
+  `model:` provides device model (ie. SH5K - as found in current models supported above)
 
-client.
+  `device_code:` Sungrow device code found at register 5000 (refer docs for actual codes if needed)
 
+  `serial_number:` Serial number of the inverter
+
+  `nominal_output_power:` The output power that the inverter supports (ie. SH5K is a 5 kWh inverter and will contain 5.0 in this parameter)
+
+  `inverter_type:` [hybrid | string] - type of sungrow inverter that the client is communicating with, hybrid (battery supported inverter SHxxx series or standard inverter SGxxxx series)
+
+  `mppt_input:` The number of mppt inputs the inverter supports, refer notes below.
+
+  `data:` provides a dictionary of data of all registers queried (key = register name, value = register value) refer to the https://github.com/mvandersteen/SungrowInverter/tree/main/sungrowinverter/configs for details on what registers are exposed.
+
+#### Hybrid (storage) inverters only
+  
+  `battery_type:` , this will show the configured details for the inverter
+
+  `battery_capacity :` hybrid inverters only, this will show the configured details for the inverter
+  
+  
 ## Note
+
+client = SungrowInverter("192.168.1.27")
+await client.async_update()
+  
+  `client.data['export_power']` - for this register it is a signed value if positive then the inverter is exporting to the grid, if negative then it is importing from the grid.
+
+  `client.mppt_inputs` - this value dictates how many client.data['mppt_xx_voltage'] & client.data['mppt_xx_current'] register are available. These values have been obtained from the modbus specs found in the documents directory on this repository. If an inverter only supports 1 mppt connection then only 1 set of mppt_1_voltage and mppt_1_current will appear. If the inverter supports more then mppt_<nth>_voltage & mppt_<nth>_current; where nth = the number of mppt inputs the inverter supports; the number available depends on the how many the inverter supports can be 1 to 12 sets of data for current set of support inverters. 
+  
