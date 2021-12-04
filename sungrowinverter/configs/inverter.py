@@ -26,7 +26,7 @@ INVERTER_HOLDING_REGISTERS: tuple[ModBusRegister, ...] = (
 )
 
 INVERTER_MODELS: list[SungrowInverterModel] = (
-    SungrowInverterModel(0xD03, "SH5K", "string", 2),
+    SungrowInverterModel(0xD03, "SH5K", "hybrid", 2),
     SungrowInverterModel(0xD06, "SH3K6", "hybrid", 2),
     SungrowInverterModel(0xD07, "SH4K6", "hybrid", 2),
     SungrowInverterModel(0xD09, "SH5K-20", "hybrid", 2),

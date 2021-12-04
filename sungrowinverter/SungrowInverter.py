@@ -261,6 +261,8 @@ class SungrowInverter:
             await self.inverter_model()
 
         if self.model is not None:
+            
+            calculation_registers = None
 
             if self.inverter_type == "hybrid":
                 inverter_scan = HYBRID_SCAN
@@ -272,7 +274,7 @@ class SungrowInverter:
                 inverter_scan = STRING_SCAN
                 read_registers = STRING_READ_REGISTERS
                 holding_registers = STRING_HOLDING_REGISTERS
-
+                
             else:
                 _LOGGING.error("Inverter type is not supported")
                 return False

@@ -123,16 +123,11 @@ COUNTRY_CODES = {
 # reason being registers start at 0, document for modbus usually refers to register 1 as the start of registers.
 STRING_SCAN = {
     "read": [
-        {"scan_start": 4999, "scan_range": 114},
-        {"scan_start": 5114, "scan_range": 40},
-        {"scan_start": 7012, "scan_range": 24},
-        # {"scan_start": 6199, "scan_range": 100},
-        # {"scan_start": 6399, "scan_range": 100},
-        # {"scan_start": 6499, "scan_range": 100},
+        {"scan_start": 4999, "scan_range": 110},
+        {"scan_start": 5112, "scan_range": 50},
     ],
     "holding": [
         {"scan_start": 4999, "scan_range": 6},
-        {"scan_start": 12999, "scan_range": 101},
     ],
 }
 
