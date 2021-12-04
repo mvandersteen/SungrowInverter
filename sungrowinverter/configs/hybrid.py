@@ -121,7 +121,7 @@ HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(13034, "total_active_power", "U32", 0.1, WATT),
     ModBusRegister(13036, "daily_import_energy", "U16", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13037, "total_import_energy", "U32", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13039, "battery_capacity", "U32", 0.1, KILO_WATT_HOUR),
+
     ModBusRegister(13040, "daily_charge_from_grid", "U16", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13041, "total_charge_from_grid", "U16", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13045, "daily_export_from_battery", "U16", 0.1, KILO_WATT_HOUR),

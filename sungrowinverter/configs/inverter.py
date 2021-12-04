@@ -5,6 +5,8 @@ from sungrowinverter.configs.common import (
     SungrowInverterModel,
     KILO_WATT,
     VOLTAGE,
+    AMPERE,
+    AMP_HOUR,
     BATTERY_TYPES,
 )
 
@@ -22,7 +24,7 @@ INVERTER_READ_REGISTERS: tuple[ModBusRegister, ...] = (
 INVERTER_HOLDING_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(13055, "battery_type", "U16", table=BATTERY_TYPES),
     ModBusRegister(13056, "battery_nominal_voltage", "U16", 0.1, VOLTAGE),
-    ModBusRegister(13057, "battery_capacity", "U16"),
+    ModBusRegister(13057, "battery_capacity", "U16", 1, AMP_HOUR),
 )
 
 INVERTER_MODELS: list[SungrowInverterModel] = (

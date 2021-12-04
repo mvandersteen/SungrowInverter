@@ -9,7 +9,7 @@ Supports Sungrow Hybrid & String inverters
 Refer configs/hybrid.py and configs/string.py for inverters that are supported.
 """
 
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 
 from SungrowModbusTcpClient import SungrowModbusTcpClient
 
@@ -59,7 +59,7 @@ class SungrowInverter:
         self.inverter_type = None
 
         self.battery_type = None
-        self.battery_capacity = None
+        self.battery_energy_capacity = None
 
         self._modbusclient = None
         self._slave = slave
@@ -241,10 +241,10 @@ class SungrowInverter:
 
                         if "battery_type" in self.data:
                             self.battery_type = self.data["battery_type"]
-                            self.battery_capacity = round((self.data["battery_nominal_voltage"] * self.data["battery_capacity"]) / 1000, 1)
-                            self.data["battery_capacity"] = self.battery_capacity
+                            self.battery_energy_capacity = round((self.data["battery_nominal_voltage"] * self.data["battery_capacity"]) / 1000, 1)
+                            self.data["battery_energy_capacity"] = self.battery_energy_capacity
 
-                        _LOGGING.info("Storage device attached to inverter: [Model: %s, Capacity: %s kWh]", self.battery_type, self.battery_capacity)
+                        _LOGGING.info("Storage device attached to inverter: [Model: %s, Capacity: %s kWh]", self.battery_type, self.battery_energy_capacity)
                     return inverter_model
 
                 _LOGGING.error("Supported inverter device type code %s was not found in our supported devices", self.data["device_type_code"])
