@@ -13,7 +13,9 @@
 
 from sungrowinverter.configs.common import (
     ModBusRegister,
+    CalcRegister,
     OUTPUT_TYPE_CODES,
+    GRID_STATE_CODES,
     TEMP_CELSIUS,
     KILO_WATT_HOUR,
     WATT,
@@ -66,7 +68,6 @@ HYBRID_SCAN = {
     "read": [
         {"scan_start": 5000, "scan_range": 50},
         {"scan_start": 12999, "scan_range": 100},
-        {"scan_start": 13099, "scan_range": 20},
     ],
     "holding": [
         {"scan_start": 4999, "scan_range": 6},
@@ -75,8 +76,8 @@ HYBRID_SCAN = {
 
 HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(5002, "output_type", "U16", table=OUTPUT_TYPE_CODES),
-    ModBusRegister(5003, "daily_output_energy", "U16", 0.1, KILO_WATT_HOUR, description="Hybrid active power accumulation (Include PV generation and battery discharge energy)"),
-    ModBusRegister(5004, "total_output_energy", "U32", 0.1, KILO_WATT_HOUR, description="Hybrid active power accumulation (Include PV generation and battery discharge energy)"),
+    ModBusRegister(5003, "daily_energy_yield", "U16", 0.1, KILO_WATT_HOUR, description="Hybrid active power accumulation (Include PV generation and battery discharge energy)"),
+    ModBusRegister(5004, "total_energy_yield", "U32", 0.1, KILO_WATT_HOUR, description="Hybrid active power accumulation (Include PV generation and battery discharge energy)"),
     ModBusRegister(5008, "inside_temperature", "U16", 0.1, TEMP_CELSIUS, description="Internal inverter temperature"),
     ModBusRegister(5011, "mppt_1_voltage", "U16", 0.1, VOLTAGE),
     ModBusRegister(5012, "mppt_1_current", "U16", 0.1, AMPERE),
@@ -95,16 +96,15 @@ HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(13001, "running_state", "U16", transform="BINARY", length=8, table=RUNNING_STATE_BITS),
     ModBusRegister(13002, "daily_pv_generation", "U16", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13003, "total_pv_generation", "U32", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13005, "daily_export_power_from_pv", "U16", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13006, "total_export_power_from_pv", "U32", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13005, "daily_export_from_pv", "U16", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13006, "total_export_from_pv", "U32", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13008, "load_power", "S32", unit_of_measure=WATT),
     ModBusRegister(13010, "export_power", "S32", unit_of_measure=WATT),
-    ModBusRegister(13012, "daily_battery_charge_energy_from_pv", "U16", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13013, "total_battery_charge_energy_from_pv", "U32", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13012, "daily_battery_charge_from_pv", "U16", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13013, "total_battery_charge_from_pv", "U32", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13015, "co2_reduction", "U32", 0.1, KILOGRAMS),
-    ModBusRegister(13017, "daily_direct_energy_consuption", "U16", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13018, "total_direct_energy_consuption", "U32", 0.1, KILO_WATT_HOUR),
-
+    ModBusRegister(13017, "daily_direct_energy_consumption", "U16", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13018, "total_direct_energy_consumption", "U32", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13020, "battery_voltage", "U16", 0.1, VOLTAGE),
     ModBusRegister(13021, "battery_current", "U16", 0.1, AMPERE),
     ModBusRegister(13022, "battery_power", "U16", 0.1, WATT),
@@ -114,26 +114,18 @@ HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(13026, "daily_battery_discharge_energy", "U16", 0.1, KILO_WATT_HOUR, description="Daily energy that was discharged into the grid"),
     ModBusRegister(13027, "total_battery_discharge_energy", "U32", 0.1, KILO_WATT_HOUR, description="Total energy that was discharged into the grid"),
     ModBusRegister(13029, "self_consumption_today", "U16", 0.1, PERCENTAGE),
+    ModBusRegister(13030, "grid_state", "U16", table=GRID_STATE_CODES),
+    ModBusRegister(13031, "phase_a_current", "U16", 0.1, AMPERE),
+    ModBusRegister(13032, "phase_b_current", "U16", 0.1, AMPERE),
+    ModBusRegister(13033, "phase_c_current", "U16", 0.1, AMPERE),
     ModBusRegister(13034, "total_active_power", "U32", 0.1, WATT),
     ModBusRegister(13036, "daily_import_energy", "U16", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13037, "total_import_energy", "U32", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13039, "battery_capacity", "U32", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13040, "daily_charge_energy", "U16", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13041, "total_charge_energy", "U16", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13045, "daily_export_energy", "U16", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13046, "total_export_energy", "U32", 0.1, KILO_WATT_HOUR),
-    ModBusRegister(13102, "maximum_discharging_current", "U16", unit_of_measure=AMPERE),
-    ModBusRegister(13102, "maximum_charging_current", "U16", unit_of_measure=AMPERE),
-    ModBusRegister(13107, "battery_state_of_charge", "U16", 0.1, PERCENTAGE),
-    ModBusRegister(13112, "battery_cycle_count", "U16"),
-    ModBusRegister(13112, "cell_voltage_average", "U16", 0.1, VOLTAGE),
-    ModBusRegister(13114, "cell_voltage_minimum", "U16", 0.1, VOLTAGE),
-    ModBusRegister(13113, "cell_voltage_maximum", "U16", 0.1, VOLTAGE),
-    ModBusRegister(13114, "cell_voltage_minimum", "U16", 0.1, VOLTAGE),
-    ModBusRegister(13115, "battery_voltage", "U16", 0.01, VOLTAGE),
-    ModBusRegister(13116, "cell_temperature_average", "U16", 0.1, TEMP_CELSIUS),
-    ModBusRegister(13117, "cell_temperature_minimum", "U16", 0.1, TEMP_CELSIUS),
-    ModBusRegister(13118, "cell_temperature_maximum", "U16", 0.1, TEMP_CELSIUS),
+    ModBusRegister(13040, "daily_charge_from_grid", "U16", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13041, "total_charge_from_grid", "U16", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13045, "daily_export_from_battery", "U16", 0.1, KILO_WATT_HOUR),
+    ModBusRegister(13046, "total_export_from_battery", "U32", 0.1, KILO_WATT_HOUR),
 )
 
 HYBRID_HOLDING_REGISTERS: tuple[ModBusRegister, ...] = (
@@ -143,4 +135,9 @@ HYBRID_HOLDING_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(5003, "hour", "U16"),
     ModBusRegister(5004, "minute", "U16"),
     ModBusRegister(5005, "second", "U16"),
+)
+
+HYBRID_CALCULATED_REGISTERS: tuple[CalcRegister, ...] = (
+    CalcRegister("daily_export_energy", KILO_WATT_HOUR, "self.data['daily_export_from_pv'] + self.data['daily_export_from_battery']"),
+    CalcRegister("total_export_energy", KILO_WATT_HOUR, "self.data['total_export_from_pv'] + self.data['total_export_from_battery']"),    
 )

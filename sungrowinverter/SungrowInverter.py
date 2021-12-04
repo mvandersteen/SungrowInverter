@@ -26,6 +26,7 @@ from sungrowinverter.configs.hybrid import (
     HYBRID_SCAN,
     HYBRID_READ_REGISTERS,
     HYBRID_HOLDING_REGISTERS,
+    HYBRID_CALCULATED_REGISTERS,
 )
 from sungrowinverter.configs.string import (
     STRING_SCAN,
@@ -107,67 +108,72 @@ class SungrowInverter:
 
         for current_register in modbus_registers:
 
-            if (start + 1) <= current_register.address <= (start + 1 + count):
+            if (start + 1) <= current_register.address < (start + 1 + count):
 
                 if not next((x for x in modbus_registers if x.address == current_register.address), None,) is None:
 
-                    if not current_register.valid_inverters is None:
-                        if not self.device_code in current_register.valid_inverters:
-                            continue
+                    try:
 
-                    # We want to make sure we only add the neccessary mppt entries we dont need to create data
-                    # if the inverter don't support it (most have 2, others 1, 3 or more)
-                    if current_register.key.startswith("mppt_"):
-                        mppt_key = current_register.key.split("_")
-                        if int(mppt_key[1]) > self.mppt_inputs:
-                            continue
+                        if not current_register.valid_inverters is None:
+                            if not self.device_code in current_register.valid_inverters:
+                                continue
 
-                    register_index = current_register.address - (start + 1)
+                        # We want to make sure we only add the neccessary mppt entries we dont need to create data
+                        # if the inverter don't support it (most have 2, others 1, 3 or more)
+                        if current_register.key.startswith("mppt_"):
+                            mppt_key = current_register.key.split("_")
+                            if int(mppt_key[1]) > self.mppt_inputs:
+                                continue
 
-                    if current_register.data_type == "U16":
-                        value = response.registers[register_index]
+                        register_index = current_register.address - (start + 1)
 
-                    elif current_register.data_type == "U32":
-                        value = (response.registers[register_index + 1] << 16) + response.registers[register_index]
+                        if current_register.data_type == "U16":
+                            value = response.registers[register_index]
 
-                    elif current_register.data_type == "S16":
-                        value = int.from_bytes(response.registers[register_index].to_bytes(2, "little"), "little", signed=True)
+                        elif current_register.data_type == "U32":
+                            value = (response.registers[register_index + 1] << 16) + response.registers[register_index]
 
-                    elif current_register.data_type == "S32":
-                        value = int.from_bytes(((response.registers[register_index + 1] << 16) + response.registers[register_index]).to_bytes(4, "little"), "little", signed=True)
+                        elif current_register.data_type == "S16":
+                            value = int.from_bytes(response.registers[register_index].to_bytes(2, "little"), "little", signed=True)
 
-                    elif current_register.data_type == "UTF8":
-                        value = await self._get_utf8(response.registers, register_index, current_register.length)
+                        elif current_register.data_type == "S32":
+                            value = int.from_bytes(((response.registers[register_index + 1] << 16) + response.registers[register_index]).to_bytes(4, "little"), "little", signed=True)
 
-                    else:
-                        _LOGGING.debug("Unknown data_type used for register %s [register: %s data_type: %s]",
-                                        current_register.key, current_register.address, current_register.data_type)
+                        elif current_register.data_type == "UTF8":
+                            value = await self._get_utf8(response.registers, register_index, current_register.length)
 
-                    if current_register.unit_precision is not None:
-                        value = round(value * current_register.unit_precision, 1)
-
-                    if current_register.table is not None:
-
-                        # if we need to decode a returned value into a set of binary information
-                        # table hold binary map
-                        # value here will contain the bits to translate against the binary map
-                        if current_register.transform == "BINARY":
-                            # we will set each bit into a value ie. whether something is on or off usually.
-                            binary_map = current_register.table
-                            bit_val = 1
-                            while bit_val < 2 ** int(current_register.length):
-                                if bit_val in binary_map:
-                                    if value & bit_val == bit_val:
-                                        self.data[binary_map[bit_val]] = True
-                                    else:
-                                        self.data[binary_map[bit_val]] = False
-                                bit_val = bit_val << 1
                         else:
-                            #if value in current_register.table:
-                            self.data[current_register.key] = current_register.table[value]
+                            _LOGGING.debug("Unknown data_type used for register %s [register: %s data_type: %s]",
+                                            current_register.key, current_register.address, current_register.data_type)
 
-                    else:
-                        self.data[current_register.key] = value
+                        if current_register.unit_precision is not None:
+                            value = round(value * current_register.unit_precision, 1)
+
+                        if current_register.table is not None:
+
+                            # if we need to decode a returned value into a set of binary information
+                            # table hold binary map
+                            # value here will contain the bits to translate against the binary map
+                            if current_register.transform == "BINARY":
+                                # we will set each bit into a value ie. whether something is on or off usually.
+                                binary_map = current_register.table
+                                bit_val = 1
+                                while bit_val < 2 ** int(current_register.length):
+                                    if bit_val in binary_map:
+                                        if value & bit_val == bit_val:
+                                            self.data[binary_map[bit_val]] = True
+                                        else:
+                                            self.data[binary_map[bit_val]] = False
+                                    bit_val = bit_val << 1
+                            else:
+                                #if value in current_register.table:
+                                self.data[current_register.key] = current_register.table[value]
+
+                        else:
+                            self.data[current_register.key] = value
+                    
+                    except Exception as err:
+                        exp = err
 
         return True
 
@@ -260,10 +266,13 @@ class SungrowInverter:
                 inverter_scan = HYBRID_SCAN
                 read_registers = HYBRID_READ_REGISTERS
                 holding_registers = HYBRID_HOLDING_REGISTERS
+                calculation_registers = HYBRID_CALCULATED_REGISTERS
+
             elif self.inverter_type == "string":
                 inverter_scan = STRING_SCAN
                 read_registers = STRING_READ_REGISTERS
                 holding_registers = STRING_HOLDING_REGISTERS
+
             else:
                 _LOGGING.error("Inverter type is not supported")
                 return False
@@ -279,6 +288,10 @@ class SungrowInverter:
                         return False
 
             self._modbusclient.close()
+
+            if calculation_registers is not None:
+                for register_calc in calculation_registers:
+                    self.data[register_calc.key] = eval(register_calc.calculation)
 
             try:
                 self.data["timestamp"] = '%s/%s/%s %02d:%02d:%02d' % (

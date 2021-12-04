@@ -48,6 +48,24 @@ class ModBusRegister:
         self.dataset = dataset
 
 @dataclass
+class CalcRegister:
+    """Describes a extra calcuation register for determine extra data """
+
+    key: str
+    data_type: str
+
+    calculation: str
+    unit_precision: float | None = None
+    unit_of_measure: str | None = None
+
+    def __init__(self, key, data_type, calculation, unit_precision=None, unit_of_measure=None, ) -> None:
+        self.key = key
+        self.data_type = data_type
+        self.calculation = calculation
+        self.unit_precision = unit_precision
+        self.unit_of_measure = unit_of_measure
+
+@dataclass
 class SungrowInverterModel:
     """Describes a Sungrow Inverter"""
 
