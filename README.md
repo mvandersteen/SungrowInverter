@@ -2,7 +2,7 @@
 
 Provides a way to query Sungrow residential hybrid or string inverters for current state and statistics using ModBus TCP client.
 
-Currently does not support any writing to holding registers (for now).
+Currently does not support any writing to holding registers.
 
 ## Supported Residental Inverters
 
@@ -69,6 +69,8 @@ print(client.model)
 print(client.data)
 ```
 
+** of course change 192.168.1.127 to your inverter's ip address.
+
 ## Methods and Variables
 
 ### Contructor
@@ -124,5 +126,8 @@ await client.async_update()
 ```
   `client.data['export_power']` - for this register it is a signed value if positive then the inverter is exporting to the grid, if negative then it is importing from the grid.
 
-  `client.mppt_inputs` - this value dictates how many client.data['mppt_xx_voltage'] & client.data['mppt_xx_current'] register are available. These values have been obtained from the modbus specs found in the documents directory on this repository. If an inverter only supports 1 mppt connection then only 1 set of mppt_1_voltage and mppt_1_current will appear. If the inverter supports more then mppt\_\[xx\]\_voltage & mppt\_\[xx\]\_current; where [xx] = the number of mppt inputs the inverter supports; the number available depends on the how many the inverter supports can be 1 to 12 sets of data for current set of support inverters. 
+  `client.mppt_inputs` - this value dictates how many client.data['mppt_xx_voltage'] & client.data['mppt_xx_current'] registers are available. These values have been obtained from the modbus specs found in the documents directory on this repository. If an inverter only supports 1 mppt connection then only 1 set of mppt_1_voltage and mppt_1_current will appear. If the inverter supports more then mppt\_\[xx\]\_voltage & mppt\_\[xx\]\_current; where [xx] = the number of mppt inputs the inverter supports; the number available depends on the how many the inverter supports can be 1 to 12 sets of data for current set of support inverters. 
   
+## Python Version prior to 3.9
+
+Refer to https://github.com/mvandersteen/SungrowInverter/issues/2 if you are having issues, where @hallonstedt explains how to resolve for a prior version of python.

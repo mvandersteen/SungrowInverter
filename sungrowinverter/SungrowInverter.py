@@ -9,7 +9,7 @@ Supports Sungrow Hybrid & String inverters
 Refer configs/hybrid.py and configs/string.py for inverters that are supported.
 """
 
-__version__ = "0.1.7"
+__version__ = "0.1.8"
 
 from SungrowModbusTcpClient import SungrowModbusTcpClient
 
@@ -35,8 +35,6 @@ from sungrowinverter.configs.string import (
 )
 
 import logging
-
-_LOGGING = logging.getLogger(__name__)
 
 REQUESTS_TIMEOUT = 60
 
@@ -77,7 +75,7 @@ class SungrowInverter:
 
         self._modbusclient = SungrowModbusTcpClient.SungrowModbusTcpClient(**client_payload)
 
-        _LOGGING.debug("Sungrow modbus TCP client - [IP:%s Port:%s]", ip_address, port)
+        logging.debug("Sungrow modbus TCP client - [IP:%s Port:%s]", ip_address, port)
 
     async def _load_registers(self, register_type, start, modbus_registers, count=100):
         try:
@@ -86,25 +84,25 @@ class SungrowInverter:
             elif register_type == "holding":
                 response = self._modbusclient.read_holding_registers(int(start), count=count, unit=self._slave)
             else:
-                _LOGGING.error("Unsupported register type: %s", register_type)
+                logging.error("Unsupported register type: %s", register_type)
 
         except Exception as err:
-            _LOGGING.warning("No data. Try increasing the timeout or scan interval: %s", err, exc_info=1)
+            logging.warning("No data. Try increasing the timeout or scan interval: %s", err, exc_info=1)
             return False
 
         if response.isError():
-            _LOGGING.warning("Modbus connection failed, connection could not be made or register range failed to be read.")
+            logging.warning("Modbus connection failed, connection could not be made or register range failed to be read.")
             return False
 
         if not hasattr(response, "registers"):
-            _LOGGING.warning("No registers returned")
+            logging.warning("No registers returned")
             return
 
         if len(response.registers) != count:
-            _LOGGING.warning("Mismatched number of registers read %s != %s", len(response.registers), count)
+            logging.warning("Mismatched number of registers read %s != %s", len(response.registers), count)
             return
 
-        _LOGGING.debug("Registers: %s [start_register: %s, register_count: %s] contents: %s", register_type, int(start) + 1, count, response.registers)
+        logging.debug("Registers: %s [start_register: %s, register_count: %s] contents: %s", register_type, int(start) + 1, count, response.registers)
 
         for current_register in modbus_registers:
 
@@ -143,7 +141,7 @@ class SungrowInverter:
                             value = await self._get_utf8(response.registers, register_index, current_register.length)
 
                         else:
-                            _LOGGING.debug("Unknown data_type used for register %s [register: %s data_type: %s]",
+                            logging.debug("Unknown data_type used for register %s [register: %s data_type: %s]",
                                             current_register.key, current_register.address, current_register.data_type)
 
                         if current_register.unit_precision is not None:
@@ -197,57 +195,64 @@ class SungrowInverter:
         # if we fail to connect then do nothing and exit
         if self.model is None:
 
-            self._modbusclient.connect()
+            connection = self._modbusclient.connect()
 
-            # load the inverter registers to get static data, and determine if model found is supported.
-            for scan_type in INVERTER_SCAN["read"]:
-                if not await self._load_registers("read", scan_type["scan_start"], INVERTER_READ_REGISTERS, scan_type["scan_range"]):
-                    return False
+            if connection:
+                # load the inverter registers to get static data, and determine if model found is supported.
+                for scan_type in INVERTER_SCAN["read"]:
+                    if not await self._load_registers("read", scan_type["scan_start"], INVERTER_READ_REGISTERS, scan_type["scan_range"]):
+                        return False
 
-            self._modbusclient.close()
+                self._modbusclient.close()
 
-            if "device_type_code" in self.data:
-                inverter_model = next((x for x in INVERTER_MODELS if x.device_code == self.data["device_type_code"]), None,)
+                if "device_type_code" in self.data:
+                    inverter_model = next((x for x in INVERTER_MODELS if x.device_code == self.data["device_type_code"]), None,)
 
-                if inverter_model is not None:
-                    self.model = inverter_model.model
-                    self.data["model"] = inverter_model.model
-                    self.inverter_type = inverter_model.inverter_type
-                    self.mppt_inputs = inverter_model.mppt_inputs
-                    self.serial_number = self.data["serial_number"]
-                    self.nominal_output_power = f"{self.data['nominal_output_power']} kW"
-                    inverter_model.nominal_output_power = self.nominal_output_power
-                    inverter_model.serial_number = self.serial_number
-                    self.device_code = self.data['device_type_code']
+                    if inverter_model is not None:
+                        self.model = inverter_model.model
+                        self.data["model"] = inverter_model.model
+                        self.inverter_type = inverter_model.inverter_type
+                        self.mppt_inputs = inverter_model.mppt_inputs
+                        self.serial_number = self.data["serial_number"]
+                        self.nominal_output_power = f"{self.data['nominal_output_power']} kW"
+                        inverter_model.nominal_output_power = self.nominal_output_power
+                        inverter_model.serial_number = self.serial_number
+                        self.device_code = self.data['device_type_code']
 
-                    _LOGGING.info(
-                        "Sungrow residential inverter found: [Device Code: %s, Model: %s, Nominal Ouput: %s, Serial# %s]",
-                        hex(inverter_model.device_code),
-                        inverter_model.model,
-                        inverter_model.nominal_output_power,
-                        inverter_model.serial_number,
-                    )
+                        logging.info(
+                            "Sungrow residential inverter found: [Device Code: %s, Model: %s, Nominal Ouput: %s, Serial# %s]",
+                            hex(inverter_model.device_code),
+                            inverter_model.model,
+                            inverter_model.nominal_output_power,
+                            inverter_model.serial_number,
+                        )
 
-                    # see if the inverter supports a battery if so grab that data also
-                    if inverter_model.inverter_type == "hybrid":
-                        self._modbusclient.connect()
+                        # see if the inverter supports a battery if so grab that data also
+                        if inverter_model.inverter_type == "hybrid":
+                            
+                            connection = self._modbusclient.connect()
+                            if connection:
 
-                        # load the inverter registers to get static data, and determine if model found is supported.
-                        for scan_type in INVERTER_SCAN["holding"]:
-                            if not await self._load_registers("holding", scan_type["scan_start"], INVERTER_HOLDING_REGISTERS, scan_type["scan_range"]):
-                                return False
+                                # load the inverter registers to get static data, and determine if model found is supported.
+                                for scan_type in INVERTER_SCAN["holding"]:
+                                    if not await self._load_registers("holding", scan_type["scan_start"], INVERTER_HOLDING_REGISTERS, scan_type["scan_range"]):
+                                        return False
 
-                        self._modbusclient.close()
+                                self._modbusclient.close()
 
-                        if "battery_type" in self.data:
-                            self.battery_type = self.data["battery_type"]
-                            self.battery_energy_capacity = round((self.data["battery_nominal_voltage"] * self.data["battery_capacity"]) / 1000, 1)
-                            self.data["battery_energy_capacity"] = self.battery_energy_capacity
+                                if "battery_type" in self.data:
+                                    self.battery_type = self.data["battery_type"]
+                                    self.battery_energy_capacity = round((self.data["battery_nominal_voltage"] * self.data["battery_capacity"]) / 1000, 1)
+                                    self.data["battery_energy_capacity"] = self.battery_energy_capacity
 
-                        _LOGGING.info("Storage device attached to inverter: [Model: %s, Capacity: %s kWh]", self.battery_type, self.battery_energy_capacity)
-                    return inverter_model
+                                logging.info("Storage device attached to inverter: [Model: %s, Capacity: %s kWh]", self.battery_type, self.battery_energy_capacity)
+                            return inverter_model
+                        else:
+                            logging.error("CONNECTION ERROR: Could not connect to inverter @ Host: %s, Port: %s", self._modbusclient.host, self._modbusclient.port)                                        
 
-                _LOGGING.error("Supported inverter device type code %s was not found in our supported devices", self.data["device_type_code"])
+                    logging.error("UPSUPPORT INVERTER: Supported inverter device_type_code [%s] is not supported", self.data["device_type_code"])
+            else:
+                logging.error("CONNECTION ERROR: Could not connect to inverter @ Host: %s, Port: %s", self._modbusclient.host, self._modbusclient.port)                                        
         else:
             return SungrowInverterModel(self.device_code, self.model, self.inverter_type, self.mppt_inputs, self.nominal_output_power, self.serial_number)
 
@@ -276,31 +281,36 @@ class SungrowInverter:
                 holding_registers = STRING_HOLDING_REGISTERS
                 
             else:
-                _LOGGING.error("Inverter type is not supported")
+                logging.error("UNSUPPORTED INVERTER: Inverter type is not supported")
                 return False
 
-            self._modbusclient.connect()
+            connected = self._modbusclient.connect()
 
-            for scan_type, scan_settings in inverter_scan.items():
-                for scan in scan_settings:
-                    if not await self._load_registers(scan_type,
-                                                      scan["scan_start"],
-                                                      read_registers if scan_type == "read" else holding_registers,
-                                                      int(scan["scan_range"])):
-                        return False
+            if connected:
+                for scan_type, scan_settings in inverter_scan.items():
+                    for scan in scan_settings:
+                        if not await self._load_registers(scan_type,
+                                                          scan["scan_start"],
+                                                          read_registers if scan_type == "read" else holding_registers,
+                                                          int(scan["scan_range"])):
+                            return False
 
-            self._modbusclient.close()
+                self._modbusclient.close()
 
-            if calculation_registers is not None:
-                for register_calc in calculation_registers:
-                    self.data[register_calc.key] = eval(register_calc.calculation)
+                if calculation_registers is not None:
+                    for register_calc in calculation_registers:
+                        self.data[register_calc.key] = eval(register_calc.calculation)
 
-            try:
-                self.data["timestamp"] = '%s/%s/%s %02d:%02d:%02d' % (
-                    self.data["year"], self.data["month"], self.data["day"],
-                    self.data["hour"], self.data["minute"], self.data["second"])
-            except Exception:
-                pass
+                try:
+                    self.data["timestamp"] = '%s/%s/%s %02d:%02d:%02d' % (
+                        self.data["year"], self.data["month"], self.data["day"],
+                        self.data["hour"], self.data["minute"], self.data["second"])
+                except Exception:
+                    pass
 
-        _LOGGING.debug("DEBUG: scraped data %s", self.data)
-        return True
+                logging.debug("Inverter register data %s", self.data)
+                return True
+            else:
+                logging.error("CONNECTION ERROR: Could not connect to inverter to read modbus registers")
+
+        return False

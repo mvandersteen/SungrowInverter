@@ -1,9 +1,10 @@
 {
   "ExpandedNodes": [
     "",
+    "\\docs",
     "\\sungrowinverter",
     "\\sungrowinverter\\configs"
   ],
-  "SelectedNode": "\\setup.cfg",
+  "SelectedNode": "\\sungrowinverter\\configs\\hybrid.py",
   "PreviewInSolutionExplorer": false
 }

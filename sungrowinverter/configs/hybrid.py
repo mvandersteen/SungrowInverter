@@ -40,6 +40,8 @@ SYSTEM_STATE_CODES = {
     0x4000: "Running in external EMS mode",
 }
 
+# a data item will exist for each of these states, 
+# the running_state register translates to each of bits below.
 RUNNING_STATE_BITS = {
     0b00000001: "status_power_generated_from_pv",
     0b00000010: "status_charging",
@@ -59,7 +61,7 @@ EMS_MODE_CODES = {
 COMMAND_CHARGE_CODES = {
     0xAA: "Charge",
     0xBB: "Discharge",
-    0xCC: "Stop (defualt)"
+    0xCC: "Stop (default)"
 }
 
 # the scan register start 1 less than the actual register recorded in specs.
@@ -71,6 +73,8 @@ HYBRID_SCAN = {
     ],
     "holding": [
         {"scan_start": 4999, "scan_range": 6},
+        {"scan_start": 12999, "scan_range": 15},
+        {"scan_start": 13049, "scan_range": 51},
     ],
 }
 
@@ -86,8 +90,8 @@ HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(5017, "total_dc_power", "U32", unit_of_measure=WATT, description="PV power that is usable (inverter inefficiency)"),
     ModBusRegister(5019, "grid_voltage", "U16", 0.1, VOLTAGE),
     ModBusRegister(5019, "phase_a_voltage", "U16", 0.1, VOLTAGE, description="Phase A (1-2) voltage is also the grid voltage on a single phase inverter"),
-    ModBusRegister(5020, "phase_b_voltage", "U16", 0.1, VOLTAGE),
-    ModBusRegister(5021, "phase_c_voltage", "U16", 0.1, VOLTAGE),
+    ModBusRegister(5020, "phase_b_voltage", "U16", 0.1, VOLTAGE, valid_inverters=[0xE00,0xE01,0xE02,0xE03]),
+    ModBusRegister(5021, "phase_c_voltage", "U16", 0.1, VOLTAGE, valid_inverters=[0xE00,0xE01,0xE02,0xE03]),
     ModBusRegister(5033, "reactive_power", "S32", unit_of_measure="var"),
     ModBusRegister(5035, "power_factor", "U16", 0.001),
     ModBusRegister(5036, "grid_frequency", "U16", 0.1, HERTZ),
@@ -116,8 +120,8 @@ HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(13029, "self_consumption_today", "U16", 0.1, PERCENTAGE),
     ModBusRegister(13030, "grid_state", "U16", table=GRID_STATE_CODES),
     ModBusRegister(13031, "phase_a_current", "U16", 0.1, AMPERE),
-    ModBusRegister(13032, "phase_b_current", "U16", 0.1, AMPERE),
-    ModBusRegister(13033, "phase_c_current", "U16", 0.1, AMPERE),
+    ModBusRegister(13032, "phase_b_current", "U16", 0.1, AMPERE, valid_inverters=[0xE00,0xE01,0xE02,0xE03]),
+    ModBusRegister(13033, "phase_c_current", "U16", 0.1, AMPERE, valid_inverters=[0xE00,0xE01,0xE02,0xE03]),
     ModBusRegister(13034, "total_active_power", "U32", 0.1, WATT),
     ModBusRegister(13036, "daily_import_energy", "U16", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13037, "total_import_energy", "U32", 0.1, KILO_WATT_HOUR),
@@ -138,6 +142,7 @@ HYBRID_HOLDING_REGISTERS: tuple[ModBusRegister, ...] = (
 )
 
 HYBRID_CALCULATED_REGISTERS: tuple[CalcRegister, ...] = (
-    CalcRegister("daily_export_energy", KILO_WATT_HOUR, "self.data['daily_export_from_pv'] + self.data['daily_export_from_battery']"),
-    CalcRegister("total_export_energy", KILO_WATT_HOUR, "self.data['total_export_from_pv'] + self.data['total_export_from_battery']"),    
+    CalcRegister("daily_export_energy", "self.data['daily_export_from_pv'] + self.data['daily_export_from_battery']", 0.1, KILO_WATT_HOUR),
+    CalcRegister("total_export_energy", "self.data['total_export_from_pv'] + self.data['total_export_from_battery']", 0.1, KILO_WATT_HOUR),    
+    CalcRegister("inverter_efficiency", "int((self.data['daily_energy_yield'] / self.data['daily_pv_generation']) * 100)", 0, PERCENTAGE, description="Energy yield from the days pv generation"),    
 )

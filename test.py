@@ -3,15 +3,17 @@ import logging
 
 from sungrowinverter import SungrowInverter
 
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
-_LOGGING = logging.getLogger(__name__)
-_LOGGING.setLevel(logging.INFO)
-
-client = SungrowInverter("192.168.1.127")
+# Change IP Address (192.168.4.2) to suit your inverter 
+client = SungrowInverter("192.168.4.2", timeout=5)
 
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 result = loop.run_until_complete(client.async_update())
 
 #Get a list data returned from the inverter.
-print(client.data)
+if result != False:
+    print(client.data)
+else:
+    print("Could not connect to inverter")
