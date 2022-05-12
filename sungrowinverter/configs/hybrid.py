@@ -73,7 +73,7 @@ HYBRID_SCAN = {
     ],
     "holding": [
         {"scan_start": 4999, "scan_range": 6},
-        {"scan_start": 12999, "scan_range": 15},
+        {"scan_start": 12999, "scan_range": 17},
         {"scan_start": 13049, "scan_range": 51},
     ],
 }
@@ -142,7 +142,7 @@ HYBRID_HOLDING_REGISTERS: tuple[ModBusRegister, ...] = (
 )
 
 HYBRID_CALCULATED_REGISTERS: tuple[CalcRegister, ...] = (
-    CalcRegister("daily_export_energy", "self.data['daily_export_from_pv'] + self.data['daily_export_from_battery']", 0.1, KILO_WATT_HOUR),
-    CalcRegister("total_export_energy", "self.data['total_export_from_pv'] + self.data['total_export_from_battery']", 0.1, KILO_WATT_HOUR),    
-    CalcRegister("inverter_efficiency", "int((self.data['daily_energy_yield'] / self.data['daily_pv_generation']) * 100)", 0, PERCENTAGE, description="Energy yield from the days pv generation"),    
+    CalcRegister("daily_export_energy", "self.data['daily_export_from_pv'] + self.data['daily_export_from_battery']", unit_of_measure=KILO_WATT_HOUR),
+    CalcRegister("total_export_energy", "self.data['total_export_from_pv'] + self.data['total_export_from_battery']", unit_of_measure=KILO_WATT_HOUR),    
+    CalcRegister("inverter_efficiency", "int((self.data['daily_energy_yield'] / self.data['daily_pv_generation']) * 100)", unit_of_measure=PERCENTAGE, description="Energy yield from the days pv generation"),    
 )
