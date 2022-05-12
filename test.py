@@ -3,7 +3,8 @@ import logging
 
 from sungrowinverter import SungrowInverter
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.ERROR)
+#logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 # Change IP Address (192.168.4.2) to suit your inverter 
 client = SungrowInverter("192.168.4.2", timeout=5)
