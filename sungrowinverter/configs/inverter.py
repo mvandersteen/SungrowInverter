@@ -5,7 +5,6 @@ from sungrowinverter.configs.common import (
     SungrowInverterModel,
     KILO_WATT,
     VOLTAGE,
-    AMPERE,
     AMP_HOUR,
     BATTERY_TYPES,
 )

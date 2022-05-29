@@ -87,7 +87,7 @@ timeout: <in seconds> tcp connection is timed out and fails after this long
 
 ### Methods
 
-Available methods and how to use
+Available methods
 
 `client.inverter_model()` Returns a object of sungrowinverter.common.SungrowInverterModel with details of model, serial, nominal output power (kWh)
 
@@ -97,7 +97,7 @@ Available methods and how to use
 
 #### All inverters
   
-  `model:` provides device model (ie. SH5K - as found in current models supported above)
+  `model:` Provides device model (ie. SH5K - as found in current models supported above)
 
   `device_code:` Sungrow device code found at register 5000 (refer docs for actual codes if needed)
 
@@ -109,13 +109,13 @@ Available methods and how to use
 
   `mppt_input:` The number of mppt inputs the inverter supports, refer notes below.
 
-  `data:` provides a dictionary of data of all registers queried (key = register name, value = register value) refer to the https://github.com/mvandersteen/SungrowInverter/tree/main/sungrowinverter/configs for details on what registers are exposed.
+  `data:` Provides a dictionary of data of all registers queried (key = register name, value = register value) refer to the https://github.com/mvandersteen/SungrowInverter/tree/main/sungrowinverter/configs for details on what registers are exposed.
 
 #### Hybrid (storage) inverters only
   
-  `battery_type:` , this will show the configured details for the inverter
+  `battery_type:` Show the battery type configured for the inverter
 
-  `battery_capacity :` hybrid inverters only, this will show the configured details for the inverter
+  `battery_energy_capacity:` hybrid only, this will show the capacity of the battery configured for the inverter
   
   
 ## Note

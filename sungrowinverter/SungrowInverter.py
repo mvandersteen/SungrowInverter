@@ -9,7 +9,7 @@ Supports Sungrow Hybrid & String inverters
 Refer configs/hybrid.py and configs/string.py for inverters that are supported.
 """
 
-__version__ = "0.1.8"
+__version__ = "0.1.9"
 
 from SungrowModbusTcpClient import SungrowModbusTcpClient
 
@@ -246,11 +246,13 @@ class SungrowInverter:
                                     self.data["battery_energy_capacity"] = self.battery_energy_capacity
 
                                 logging.info("Storage device attached to inverter: [Model: %s, Capacity: %s kWh]", self.battery_type, self.battery_energy_capacity)
-                            return inverter_model
-                        else:
-                            logging.error("CONNECTION ERROR: Could not connect to inverter @ Host: %s, Port: %s", self._modbusclient.host, self._modbusclient.port)                                        
 
-                    logging.error("UPSUPPORT INVERTER: Supported inverter device_type_code [%s] is not supported", self.data["device_type_code"])
+                        return inverter_model
+                                       
+                    else:
+                        logging.error("UPSUPPORT INVERTER: Supported inverter device_type_code [%s] is not supported", self.data["device_type_code"])
+                else:
+                    logging.error("DEVICE CODE NOT FOUND: A device code could not be obtained from the inverter")
             else:
                 logging.error("CONNECTION ERROR: Could not connect to inverter @ Host: %s, Port: %s", self._modbusclient.host, self._modbusclient.port)                                        
         else:
@@ -314,3 +316,30 @@ class SungrowInverter:
                 logging.error("CONNECTION ERROR: Could not connect to inverter to read modbus registers")
 
         return False
+
+
+    # Core monitoring loop
+    async def async_scan(self, register_type, start_register, register_count, step_by = 20):
+        """Connect to the inverter and scan for register locations"""
+
+        connected = self._modbusclient.connect()
+
+        if connected:
+            for start in range(start_register, start_register + register_count, step_by):
+                try:
+                    if register_type == "read":
+                        response = self._modbusclient.read_input_registers(int(start - 1), count=step_by, unit=self._slave)
+                    elif register_type == "holding":
+                        response = self._modbusclient.read_holding_registers(int(start - 1), count=step_by, unit=self._slave)
+
+                    if hasattr(response, 'registers'):
+                        logging.info("[start_register: %s, register_count: %s] contents: %s", int(start_register) , register_count, response.registers)
+                    else:
+                        logging.info("[start_register: %s, register_count: %s] nothing returned", int(start_register) , register_count)
+
+                except Exception:
+                    logging.info("Exception thrown")
+
+            self._modbusclient.close()
+            return True
+        return False        
