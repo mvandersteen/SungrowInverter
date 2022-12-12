@@ -9,10 +9,9 @@ Supports Sungrow Hybrid & String inverters
 Refer configs/hybrid.py and configs/string.py for inverters that are supported.
 """
 
-__version__ = "0.1.9"
+__version__ = "0.2.0"
 
-from SungrowModbusTcpClient import SungrowModbusTcpClient
-
+from sungrowinverter.SungrowModbusTCPClient import SungrowModbusTcpClient
 from sungrowinverter.configs.inverter import (
     INVERTER_SCAN,
     INVERTER_READ_REGISTERS,
@@ -20,7 +19,7 @@ from sungrowinverter.configs.inverter import (
     INVERTER_MODELS,
 )
 
-from sungrowinverter.configs.common import SungrowInverterModel, ModBusRegister
+from sungrowinverter.configs.common import SungrowInverterModel
 
 from sungrowinverter.configs.hybrid import (
     HYBRID_SCAN,
@@ -73,16 +72,16 @@ class SungrowInverter:
             "retry_on_empty": True,
         }
 
-        self._modbusclient = SungrowModbusTcpClient.SungrowModbusTcpClient(**client_payload)
+        self._modbusclient = SungrowModbusTcpClient(**client_payload)
 
         logging.debug("Sungrow modbus TCP client - [IP:%s Port:%s]", ip_address, port)
 
     async def _load_registers(self, register_type, start, modbus_registers, count=100):
         try:
             if register_type == "read":
-                response = self._modbusclient.read_input_registers(int(start), count=count, unit=self._slave)
+                response = self._modbusclient.read_input_registers(int(start), count=count, slave=self._slave)
             elif register_type == "holding":
-                response = self._modbusclient.read_holding_registers(int(start), count=count, unit=self._slave)
+                response = self._modbusclient.read_holding_registers(int(start), count=count, slave=self._slave)
             else:
                 logging.error("Unsupported register type: %s", register_type)
 
@@ -301,8 +300,11 @@ class SungrowInverter:
 
                 if calculation_registers is not None:
                     for register_calc in calculation_registers:
-                        self.data[register_calc.key] = eval(register_calc.calculation)
-
+                        try:
+                            self.data[register_calc.key] = eval(register_calc.calculation)
+                        finally:
+                            self.data[register_calc.key] = 0
+                            
                 try:
                     self.data["timestamp"] = '%s/%s/%s %02d:%02d:%02d' % (
                         self.data["year"], self.data["month"], self.data["day"],
@@ -342,4 +344,4 @@ class SungrowInverter:
 
             self._modbusclient.close()
             return True
-        return False        
+        return False

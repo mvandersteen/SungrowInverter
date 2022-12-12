@@ -104,4 +104,6 @@ INVERTER_MODELS: list[SungrowInverterModel] = (
     SungrowInverterModel(0x2C13,'SG250HX-IN','string',12),
     SungrowInverterModel(0x2C15,'SG25CX-SA','string',3),
     SungrowInverterModel(0x2C22,'SG75CX','string',9),
+    # Maybe a correct inverter setting for unsupported SG5K-D??
+    SungrowInverterModel(0x126,'SG5K-D','string',2),
 )
