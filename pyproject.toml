@@ -1,6 +1,28 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[tool.poetry]
+name = "sungrowinverter"
+version = "0.2.1"
+description = "Query Sungrow residential hybrid or string inverters for current state and statistics using ModBus TCP client"
+authors = ["Mark Vandersteen <mark@vandersteen.me>"]
+license = "GNU General Public License"
+readme = "README.md"
+repository = "https://github.com/mvandersteen/SungrowInverter"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Networking",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
-build-backend = "setuptools.build_meta"
+
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pymodbus = ">=3.0.0"
+pycryptodomex = ">=3.11.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

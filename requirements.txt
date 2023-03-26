@@ -1,2 +1,0 @@
-pymodbus>=3.0.0
-pycryptodomex>=3.11.0
