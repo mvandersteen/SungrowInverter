@@ -302,9 +302,9 @@ class SungrowInverter:
                     for register_calc in calculation_registers:
                         try:
                             self.data[register_calc.key] = eval(register_calc.calculation)
-                        finally:
+                        except ZeroDivisionError:
                             self.data[register_calc.key] = 0
-                            
+
                 try:
                     self.data["timestamp"] = '%s/%s/%s %02d:%02d:%02d' % (
                         self.data["year"], self.data["month"], self.data["day"],
