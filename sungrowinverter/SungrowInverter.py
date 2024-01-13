@@ -302,7 +302,7 @@ class SungrowInverter:
                     for register_calc in calculation_registers:
                         try:
                             self.data[register_calc.key] = eval(register_calc.calculation)
-                        finally:
+                        except ZeroDivisionError:
                             self.data[register_calc.key] = 0
                             
                 try:
