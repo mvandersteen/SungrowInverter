@@ -131,3 +131,7 @@ await client.async_update()
 ## Python Version prior to 3.9
 
 Refer to https://github.com/mvandersteen/SungrowInverter/issues/2 if you are having issues, where @hallonstedt explains how to resolve for a prior version of python.
+
+
+## Note
+2024-05-13: I don't have a sungrow invester to test changes on any longer as house is being rebuilt, will look to update again once new build is complete and solar re-added. For now apologies will not be muc help to anyone other than accepting merge every now and then, i don't get on here much any longer.
