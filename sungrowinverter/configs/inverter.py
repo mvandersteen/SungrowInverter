@@ -45,6 +45,7 @@ INVERTER_MODELS: list[SungrowInverterModel] = (
     SungrowInverterModel(0xE0D, "SH6.0RT-V112", "hybrid", 2),
     SungrowInverterModel(0xE0E, "SH8.0RT-V112", "hybrid", 2),
     SungrowInverterModel(0xE0F, "SH10RT-V112", "hybrid", 2),
+    SungrowInverterModel(0xE13, "SH10RT-20", "hybrid", 2),
     SungrowInverterModel(0x26,'SG10KTL','string',2),
     SungrowInverterModel(0x27,'SG30KTL','string',2),
     SungrowInverterModel(0x28,'SG15KTL','string',2),
