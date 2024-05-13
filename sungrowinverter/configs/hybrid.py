@@ -32,7 +32,7 @@ SYSTEM_STATE_CODES = {
     0x10: "Initial Standby",
     0x20: "Startup",
     0x40: "Running",
-    0x100: "Falt",
+    0x100: "Fault",
     0x400: "Running in maintain mode",
     0x800: "Running in forced mode",
     0x1000: "Running in off-grid mode",
@@ -111,7 +111,7 @@ HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(13018, "total_direct_energy_consumption", "U32", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13020, "battery_voltage", "U16", 0.1, VOLTAGE),
     ModBusRegister(13021, "battery_current", "U16", 0.1, AMPERE),
-    ModBusRegister(13022, "battery_power", "U16", 0.1, WATT),
+    ModBusRegister(13022, "battery_power", "U16", WATT),
     ModBusRegister(13023, "battery_level", "U16", 0.1, PERCENTAGE),
     ModBusRegister(13024, "battery_state_of_health", "U16", 0.1, PERCENTAGE),
     ModBusRegister(13025, "battery_temperature", "U16", 0.1, TEMP_CELSIUS),
@@ -120,9 +120,9 @@ HYBRID_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(13029, "self_consumption_today", "U16", 0.1, PERCENTAGE),
     ModBusRegister(13030, "grid_state", "U16", table=GRID_STATE_CODES),
     ModBusRegister(13031, "phase_a_current", "U16", 0.1, AMPERE),
-    ModBusRegister(13032, "phase_b_current", "U16", 0.1, AMPERE, valid_inverters=[0xE00,0xE01,0xE02,0xE03,0xE0E,0xE0F]),
-    ModBusRegister(13033, "phase_c_current", "U16", 0.1, AMPERE, valid_inverters=[0xE00,0xE01,0xE02,0xE03,0xE0E,0xE0F]),
-    ModBusRegister(13034, "total_active_power", "U32", 0.1, WATT),
+    ModBusRegister(13032, "phase_b_current", "U16", 0.1, AMPERE, valid_inverters=[0xE00,0xE01,0xE02,0xE03,0xE0D,0xE0E,0xE0F]),
+    ModBusRegister(13033, "phase_c_current", "U16", 0.1, AMPERE, valid_inverters=[0xE00,0xE01,0xE02,0xE03,0xE0D,0xE0E,0xE0F]),
+    ModBusRegister(13034, "total_active_power", "U32", WATT),
     ModBusRegister(13036, "daily_import_energy", "U16", 0.1, KILO_WATT_HOUR),
     ModBusRegister(13037, "total_import_energy", "U32", 0.1, KILO_WATT_HOUR),
 
@@ -144,7 +144,7 @@ HYBRID_HOLDING_REGISTERS: tuple[ModBusRegister, ...] = (
 HYBRID_CALCULATED_REGISTERS: tuple[CalcRegister, ...] = (
     CalcRegister("daily_export_energy", "self.data['daily_export_from_pv'] + self.data['daily_export_from_battery']", unit_of_measure=KILO_WATT_HOUR),
     CalcRegister("total_export_energy", "self.data['total_export_from_pv'] + self.data['total_export_from_battery']", unit_of_measure=KILO_WATT_HOUR),
-    CalcRegister("daily_batery_charge", "self.data['daily_battery_charge_from_pv'] + self.data['daily_charge_from_grid']", unit_of_measure=KILO_WATT_HOUR),
-    CalcRegister("total_batery_charge", "self.data['total_battery_charge_from_pv'] + self.data['total_charge_from_grid']", unit_of_measure=KILO_WATT_HOUR),
+    CalcRegister("daily_battery_charge", "self.data['daily_battery_charge_from_pv'] + self.data['daily_charge_from_grid']", unit_of_measure=KILO_WATT_HOUR),
+    CalcRegister("total_battery_charge", "self.data['total_battery_charge_from_pv'] + self.data['total_charge_from_grid']", unit_of_measure=KILO_WATT_HOUR),
     CalcRegister("inverter_efficiency", "int((self.data['daily_energy_yield'] / self.data['daily_pv_generation']) * 100)", unit_of_measure=PERCENTAGE, description="Energy yield from the days pv generation")  
 )
