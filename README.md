@@ -135,3 +135,5 @@ Refer to https://github.com/mvandersteen/SungrowInverter/issues/2 if you are hav
 
 ## Note
 2024-05-13: I don't have a sungrow invester to test changes on any longer as house is being rebuilt, will look to update again once new build is complete and solar re-added. For now apologies will not be muc help to anyone other than accepting merge every now and then, i don't get on here much any longer.
+
+If you have an inverter not supported by this module BUT do get a response back from the sungrow inverter with a device ID, then you could follow what was done for this pull request https://github.com/mvandersteen/SungrowInverter/commit/9bef6dfcc4db7672edb1140b98bbdd34c672a987 by @ortogonal that is add an entry for your inverter in the inverter list and also if you have a 3 phase inverter (usually denoted by RT) add your inverter number into the list of support inverter for the relevant parameter data pulled from the inverter.
