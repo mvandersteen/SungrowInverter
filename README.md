@@ -75,7 +75,7 @@ print(client.data)
 
 ### Contructor
 
-`SungrowInverter(ip_address, port=502, slave=0x01, retries3, timeout=60)`
+`SungrowInverter(ip_address, port=502, slave=0x01, retries=3, timeout=60)`
 
 port: modbus TCP port defaults to 502 on sungrow inverters used here
 
@@ -134,6 +134,6 @@ Refer to https://github.com/mvandersteen/SungrowInverter/issues/2 if you are hav
 
 
 ## Note
-2024-05-13: I don't have a sungrow invester to test changes on any longer as house is being rebuilt, will look to update again once new build is complete and solar re-added. For now apologies will not be muc help to anyone other than accepting merge every now and then, i don't get on here much any longer.
+2024-05-13: I don't have a sungrow invester to test changes on any longer as house is being rebuilt, will look to update again once new build is complete and solar re-added. For now apologies will not be of much help to anyone other than accepting merge every now and then.
 
-If you have an inverter not supported by this module BUT do get a response back from the sungrow inverter with a device ID, then you could follow what was done for this pull request https://github.com/mvandersteen/SungrowInverter/commit/9bef6dfcc4db7672edb1140b98bbdd34c672a987 by @ortogonal that is add an entry for your inverter in the inverter list and also if you have a 3 phase inverter (usually denoted by RT) add your inverter number into the list of support inverter for the relevant parameter data pulled from the inverter.
+If you have an inverter not supported by this module BUT do get a response back from the sungrow inverter with a device ID, then you could follow what was done for this pull request https://github.com/mvandersteen/SungrowInverter/commit/9bef6dfcc4db7672edb1140b98bbdd34c672a987 by @ortogonal; that is add an entry for your inverter in the inverter list with your deviceID defined. Then if you have a 3 phase inverter (eg. SHxxRT or SGxxRT) add your inverter deviceID returned in unsupported message into the list of valid_inverters in the registers config config sections (see hybrid.py or string.py config files), (eg. ModBusRegister(5020, "phase_b_voltage", "U16", 0.1, VOLTAGE, valid_inverters=[0xE00,0xE01,0xE02,0xE03,0xE0D,0xE0E,0xE0F,0xE13])
