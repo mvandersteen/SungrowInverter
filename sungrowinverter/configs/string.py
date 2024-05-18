@@ -49,20 +49,20 @@ DEVICE_WORK_STATE_1_CODES = {
 }
 
 DEVICE_WORK_STATE_2_CODES = {
-    0b0000000000000000001: "status_run",
-    0b0000000000000000010: "status_stop",
-    0b0000000000000000100: "status_key_stop",
-    0b0000000000000001000: "status_initial_standby",
-    0b0000000000000010000: "status_standby",
-    0b0000000000000100000: "status_emergency_stop",
-    0b0000000000001000000: "status_starting",
-    0b0000000001000000000: "status_fault",
-    0b0000000010000000000: "status_alarm_run",
-    0b0000000100000000000: "status_derating_run",
-    0b0000001000000000000: "status_dispatch_run",
-    0b0000010000000000000: "status_communicate_fault",
-    0b0100000000000000000: "status_grid_connected",
-    0b1000000000000000000: "status_fault_stop",
+    1 <<  0: "status_run",
+    1 <<  1: "status_stop",
+    1 <<  3: "status_key_stop",
+    1 <<  5: "status_emergency_stop",
+    1 <<  4: "status_standby",
+    1 <<  2: "status_initial_standby",
+    1 <<  6: "status_starting",
+    1 << 10: "status_alarm_run",
+    1 << 11: "status_derating_run",
+    1 << 12: "status_dispatch_run",
+    1 <<  9: "status_fault",
+    1 << 13: "status_communicate_fault",
+    1 << 17: "status_grid_connected",
+    1 << 18: "status_fault_stop",
 }
 
 COUNTRY_CODES = {
