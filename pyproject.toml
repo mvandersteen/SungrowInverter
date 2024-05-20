@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sungrowinverter"
-version = "0.2.2"
+version = "0.2.3"
 description = "Query Sungrow residential hybrid or string inverters for current state and statistics using ModBus TCP client"
 authors = ["Mark Vandersteen <mark@vandersteen.me>"]
 license = "GNU General Public License"

@@ -9,7 +9,7 @@ Supports Sungrow Hybrid & String inverters
 Refer configs/hybrid.py and configs/string.py for inverters that are supported.
 """
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 from sungrowinverter.SungrowModbusTCPClient import SungrowModbusTcpClient
 from sungrowinverter.configs.inverter import (
