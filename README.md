@@ -69,7 +69,7 @@ print(client.model)
 print(client.data)
 ```
 
-** of course change 192.168.1.127 to your inverter's ip address.
+** of course change 192.168.1.27 to your inverter's ip address.
 
 ## Methods and Variables
 
