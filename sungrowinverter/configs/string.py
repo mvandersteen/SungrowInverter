@@ -160,7 +160,7 @@ STRING_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(5038, "system_state", "U16", table=DEVICE_WORK_STATE_1_CODES),
     ModBusRegister(5049, "nominal_reactive_power", "U16", 0.1, "kVar"),
     ModBusRegister(5071, "array_insulation_resistance", "U16", unit_of_measure="kΩ"),
-    ModBusRegister(5081, "running_state", "U32", transform="BINARY", length=19, table=DEVICE_WORK_STATE_2_CODES, description='Tanslates into work states (refer appendix 2 of sungrow refernce)'),
+    ModBusRegister(5081, "running_state", "U32", transform="BINARY", length=19, table=DEVICE_WORK_STATE_2_CODES, description='Translates into work states (refer appendix 2 of sungrow reference)'),
     ModBusRegister(5083, "meter_power", "S32", unit_of_measure=WATT, valid_inverters=[0x013C,0x013E,0x013F,0x0142,0x0143,0x0147,0x0148,0x0149,0x2C0F]),
     ModBusRegister(5085, "meter_a_phase_power", "S32", unit_of_measure=WATT, valid_inverters=[0x013C,0x013E,0x013F,0x0142,0x0143,0x0147,0x0148,0x0149,0x2C0F]),
     ModBusRegister(5087, "meter_b_phase_power", "S32", unit_of_measure=WATT, valid_inverters=[0x013C,0x013E,0x013F,0x0142,0x0143,0x0147,0x0148,0x0149,0x2C0F]),
@@ -199,9 +199,10 @@ STRING_READ_REGISTERS: tuple[ModBusRegister, ...] = (
     ModBusRegister(5137, "mppt_12_current", "U16", 0.1, AMPERE),
 
     ModBusRegister(5144, "total_power_yields", "U32", 0.1, KILO_WATT_HOUR,
-        valid_inverters=[0x139,0x13B,0x13C,0x13E,0x13F,0x142,0x143,0x147,0x148,0x149,
-                         0x14C,0x2430,0x2431,0x2432,0x2433,0x2434,0x2435,0x2436,0x2437,0x2437,
-                         0x243C,0x243D,0x243E,0x2C00,0x2C01,0x2C02,0x2C03,0x2C06,0x2C0A,0x2C0B,
+        valid_inverters=[0x139,0x13B,0x13C,0x13E,0x13F,0x142,0x143,0x147,0x148,0x149,0x14C,
+                         0x2430,0x2431,0x2432,0x2433,0x2434,0x2435,0x2436,0x2437,0x243C,0x243D,0x243E,
+                         0x2600,0x2601,0x2602,0x2603,0x2604,0x2605,0x2606,0x2607,
+                         0x2C00,0x2C01,0x2C02,0x2C03,0x2C06,0x2C0A,0x2C0B,
                          0x2C0C,0x2C0F,0x2C10,0x2C11,0x2C12,0x2C13,0x2C15,0x2C22]),
 )
 

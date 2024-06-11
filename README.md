@@ -43,7 +43,7 @@ SG40KTL-M, SG50KTL-M, SG60KTL-M, SG60KU
 If not called from within an async method
 
 ```python
-from sungrowinverter inport SungrowInverter
+from sungrowinverter import SungrowInverter
 import asyncio
 ...
 
