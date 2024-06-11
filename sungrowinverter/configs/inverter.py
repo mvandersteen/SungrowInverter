@@ -93,7 +93,14 @@ INVERTER_MODELS: list[SungrowInverterModel] = (
     SungrowInverterModel(0x243C,'SG7.0RT','string',2),
     SungrowInverterModel(0x243D,'SG3.0RT','string',2),
     SungrowInverterModel(0x243E,'SG4.0RT','string',2),
+    SungrowInverterModel(0x2600,'SG2.0RS-S','string',1), # Supplied in Issue #7
+    SungrowInverterModel(0x2601,'SG2.5RS-S','string',1),
+    SungrowInverterModel(0x2602,'SG3.0RS-S','string',1), # Assumed, please confirm if you have this inverter model
+    SungrowInverterModel(0x2603,'SG3.0RS','string',2), # Assumed, please confirm if you have this inverter model
+    SungrowInverterModel(0x2604,'SG3.6RS','string',2), # Assumed, please confirm if you have this inverter model
+    SungrowInverterModel(0x2605,'SG4.0RS','string',2), # Assumed, please confirm if you have this inverter model
     SungrowInverterModel(0x2606,'SG5.0RS','string',2),
+    SungrowInverterModel(0x2607,'SG6.0RS','string',2), # Assumed, please confirm if you have this inverter model
     SungrowInverterModel(0x2C00,'SG33CX','string',3),
     SungrowInverterModel(0x2C01,'SG40CX','string',4),
     SungrowInverterModel(0x2C02,'SG50CX','string',5),
@@ -111,8 +118,4 @@ INVERTER_MODELS: list[SungrowInverterModel] = (
     SungrowInverterModel(0x2C22,'SG75CX','string',9),
     # Maybe a correct inverter setting for unsupported SG5K-D??
     SungrowInverterModel(0x126,'SG5K-D','string',2),
-    # Supplied in Issue #7
-    SungrowInverterModel(0x2600,'SG2.0RS-S','string',1),
-    SungrowInverterModel(0x2601,'SG2.5RS-S','string',1), # Confirmed
-    SungrowInverterModel(0x2602,'SG3.0RS-S','string',1), # Assumed, please confirm if you have this inverter model
 )
