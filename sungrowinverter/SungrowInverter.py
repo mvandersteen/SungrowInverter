@@ -69,7 +69,6 @@ class SungrowInverter:
             "port": port,
             "timeout": timeout,
             "retries": retries,
-            "retry_on_empty": True,
         }
 
         self._modbusclient = SungrowModbusTcpClient(**client_payload)
